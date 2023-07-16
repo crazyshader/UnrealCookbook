@@ -20,7 +20,9 @@ public:
 
 	virtual FText GetTooltipText() const override { return FText::FromString(TEXT("a dynamic pin demo node")); }
 	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override { return FText::FromString(TEXT("Say Something")); }
-	virtual void GetContextMenuActions(const FGraphNodeContextMenuBuilder& Context) const override;
+	//virtual void GetContextMenuActions(const FGraphNodeContextMenuBuilder& Context) const override;
+	virtual void GetNodeContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const override;
+
 	// End of UEdGraphNode interface
 
 	// UK2Node interface

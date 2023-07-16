@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EdGraph/EdGraphNode.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "BlueprintWildcardLibrary.generated.h"
 
 #define P_GET_GENERIC_ARRAY(ArrayAddr, ArrayProperty) Stack.MostRecentProperty = nullptr;\
-		Stack.StepCompiledIn<UArrayProperty>(NULL);\
+		Stack.StepCompiledIn<FArrayProperty>(NULL);\
 		void* ArrayAddr = Stack.MostRecentPropertyAddress;\
-		UArrayProperty* ArrayProperty = Cast<UArrayProperty>(Stack.MostRecentProperty);\
+		FArrayProperty* ArrayProperty = CastField<FArrayProperty>(Stack.MostRecentProperty);\
 		if (!ArrayProperty) {	Stack.bArrayContextFailed = true;	return; }
 
 USTRUCT(BlueprintInternalUseOnly)
@@ -28,12 +29,12 @@ class MYBLUEPRINTNODE_API UBlueprintWildcardLibrary : public UBlueprintFunctionL
 public:
 	UFUNCTION(BlueprintCallable, CustomThunk, Category = "MyDemo", meta = (CustomStructureParam = "CustomStruct"))
 		static void ShowStructFields(const FDummyStruct& CustomStruct);
-	static void Generic_ShowStructFields(const void* StructAddr, const UStructProperty* StructProperty);
+	static void Generic_ShowStructFields(const void* StructAddr, const FStructProperty* StructProperty);
 
 
 	UFUNCTION(BlueprintPure, CustomThunk, meta = (DisplayName = "Array Numeric Property Average", ArrayParm = "TargetArray", ArrayTypeDependentParams = "TargetArray"), Category = "MyDemo")
 		static float Array_NumericPropertyAverage(const TArray<int32>& TargetArray, FName PropertyName);
-	static float GenericArray_NumericPropertyAverage(const void* TargetArray, const UArrayProperty* ArrayProperty, FName ArrayPropertyName);
+	static float GenericArray_NumericPropertyAverage(const void* TargetArray, const FArrayProperty* ArrayProperty, FName ArrayPropertyName);
 
 public:
 	DECLARE_FUNCTION(execShowStructFields) {
@@ -41,9 +42,9 @@ public:
 		Stack.MostRecentPropertyAddress = nullptr;
 		Stack.MostRecentProperty = nullptr;
 
-		Stack.StepCompiledIn<UStructProperty>(NULL);
+		Stack.StepCompiledIn<FStructProperty>(NULL);
 		void* StructAddr = Stack.MostRecentPropertyAddress;
-		UStructProperty* StructProperty = Cast<UStructProperty>(Stack.MostRecentProperty);
+		FStructProperty* StructProperty = CastField<FStructProperty>(Stack.MostRecentProperty);
 
 
 		P_FINISH;
@@ -57,9 +58,10 @@ public:
 
 		// get TargetArray
 		P_GET_GENERIC_ARRAY(ArrayAddr, ArrayProperty);
+		//P_GET_TARRAY_REF(int32, TargetArray);
 
 		// get PropertyName
-		P_GET_PROPERTY(UNameProperty, PropertyName);
+		P_GET_PROPERTY(FNameProperty, PropertyName);
 
 		P_FINISH;
 

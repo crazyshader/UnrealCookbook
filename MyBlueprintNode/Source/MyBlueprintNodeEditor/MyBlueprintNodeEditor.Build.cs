@@ -18,7 +18,8 @@ public class MyBlueprintNodeEditor : ModuleRules
             "GraphEditor",
             "BlueprintGraph",
             "KismetCompiler",
-            "MyBlueprintNode"
+            "MyBlueprintNode",
+            "ToolMenus",
         });
 
     }

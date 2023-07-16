@@ -25,6 +25,7 @@ void UBPNode_SaySomething::AllocateDefaultPins() {
 	}
 }
 
+/*
 void UBPNode_SaySomething::GetContextMenuActions(const FGraphNodeContextMenuBuilder & Context) const
 {
 	Super::GetContextMenuActions(Context);
@@ -50,6 +51,37 @@ void UBPNode_SaySomething::GetContextMenuActions(const FGraphNodeContextMenuBuil
 	}// end of if
 
 	Context.MenuBuilder->EndSection();
+}
+*/
+
+void UBPNode_SaySomething::GetNodeContextMenuActions(class UToolMenu* Menu, class UGraphNodeContextMenuContext* Context) const
+{
+	Super::GetNodeContextMenuActions(Menu, Context);
+
+	if (!Context->Node)
+	{
+		return;
+	}
+
+	if (Context->bIsDebugging)
+		return;
+
+	if (Context->Pin != nullptr)
+	{
+		if (Context->Pin->Direction == EGPD_Input && Context->Pin->ParentPin == nullptr)
+		{
+			FToolMenuSection& Section = Menu->AddSection("UBPNode_SaySomething", FText::FromString(TEXT("Say Something")));
+			Section.AddMenuEntry(
+				"AddTest",
+				FText::FromString(TEXT("Remove Word")),
+				FText::FromString(TEXT("Remove Word from input")),
+				FSlateIcon(),
+				FUIAction(
+					FExecuteAction::CreateUObject(const_cast<UBPNode_SaySomething*>(this), &UBPNode_SaySomething::RemoveInputPin, const_cast<UEdGraphPin*>(Context->Pin))
+				)
+			);
+		}
+	}
 }
 
 void UBPNode_SaySomething::GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const {

@@ -3,11 +3,17 @@
 #include "BlueprintWildcardLibrary.h"
 #include "Engine/Engine.h"
 
-void UBlueprintWildcardLibrary::Generic_ShowStructFields(const void* StructAddr, const UStructProperty* StructProperty) {
-	UScriptStruct* Struct = StructProperty->Struct;
-	for (TFieldIterator<UProperty> iter(Struct); iter; ++iter) {
+void UBlueprintWildcardLibrary::ShowStructFields(const FDummyStruct& CustomStruct)
+{
+	check(0);
+	return;
+}
 
-		FScreenMessageString NewMessage;
+void UBlueprintWildcardLibrary::Generic_ShowStructFields(const void* StructAddr, const FStructProperty* StructProperty) {
+	UScriptStruct* Struct = StructProperty->Struct;
+	for (TFieldIterator<FProperty> iter(Struct); iter; ++iter) {
+
+		/*FScreenMessageString NewMessage;
 		NewMessage.CurrentTimeDisplayed = 0.0f;
 		NewMessage.Key = INDEX_NONE;
 		NewMessage.DisplayColor = FColor::Blue;
@@ -16,8 +22,10 @@ void UBlueprintWildcardLibrary::Generic_ShowStructFields(const void* StructAddr,
 			*(Struct->GetName()),
 			*(iter->GetName())
 		);
-		NewMessage.TextScale = FVector2D::UnitVector;
-		GEngine->PriorityScreenMessages.Insert(NewMessage, 0);
+		NewMessage.TextScale = FVector2D::UnitVector;*/
+		FString Message = FString::Printf(TEXT("Property: [%s].[%s]"), *(Struct->GetName()), *(iter->GetAuthoredName()));
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Blue, Message);
+		UE_LOG(LogTemp, Log, TEXT("%s"), *Message);
 	}
 }
 
@@ -27,9 +35,9 @@ float UBlueprintWildcardLibrary::Array_NumericPropertyAverage(const TArray<int32
 	return 0.f;
 }
 
-float UBlueprintWildcardLibrary::GenericArray_NumericPropertyAverage(const void* TargetArray, const UArrayProperty* ArrayProperty, FName PropertyName) {
+float UBlueprintWildcardLibrary::GenericArray_NumericPropertyAverage(const void* TargetArray, const FArrayProperty* ArrayProperty, FName PropertyName) {
 
-	UStructProperty* InnerProperty = Cast<UStructProperty>(ArrayProperty->Inner);
+	FStructProperty* InnerProperty = CastField<FStructProperty>(ArrayProperty->Inner);
 	if (!InnerProperty) {
 		UE_LOG(LogTemp, Error, TEXT("Array inner property is NOT a UStruct!"));
 		return 0.f;
@@ -39,9 +47,9 @@ float UBlueprintWildcardLibrary::GenericArray_NumericPropertyAverage(const void*
 	// FindPropertyByName not working for Blueprint Struct
 	//UNumericProperty* NumProperty = Cast<UNumericProperty>(Struct->FindPropertyByName(PropertyName));
 	FString PropertyNameStr = PropertyName.ToString();
-	UNumericProperty* NumProperty = nullptr;
-	for (TFieldIterator<UNumericProperty> iter(Struct); iter; ++iter) {
-		if (Struct->PropertyNameToDisplayName(iter->GetFName()) == PropertyNameStr) {
+	FNumericProperty* NumProperty = nullptr;
+	for (TFieldIterator<FNumericProperty> iter(Struct); iter; ++iter) {
+		if (iter->GetAuthoredName() == PropertyNameStr) {
 			NumProperty = *iter;
 			break;
 		}
